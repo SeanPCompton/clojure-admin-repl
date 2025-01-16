@@ -1,0 +1,40 @@
+(let [file-name "changes_jfw-sb-20240207-1_20240227.csv"
+        source "jfw-sb-20240207-1"
+        target "jfw-sb-20240207-1"
+        source-version "etv-20240221-68611-E9Wp9"
+        target-version "etv-20240206-84457-6zK2F1"
+        diff  @(amperity.ent.diff/diff-trees
+                @(amperity.ent.api/get-tree ent-client target target-version)
+                @(amperity.ent.api/get-tree ent-client source source-version))
+        change-types {:diff :changed
+                      :source :added
+                      :target :removed}
+        fn-change-type (fn change-type [x] (str/capitalize (name (x change-types))))
+        report (sort-by (juxt #(fn-change-type (:amperity.ent.diff/type %))
+                              :amperity.ent.node/type
+                              :amperity.ent.node/label
+                              :amperity.ent.node/path)
+                        (map #(select-keys % [:amperity.ent.diff/type
+                                              :amperity.ent.node/metadata
+                                              :amperity.ent.node/label
+                                              :amperity.ent.node/path
+                                              :amperity.ent.node/type]) diff))
+        header ["change-type" 
+                "object-type"
+                "name"
+                "object-id"
+                "metadata"]
+
+        fn-map->row (fn map->row [{:keys [amperity.ent.node/label
+                                          amperity.ent.node/path
+                                          amperity.ent.node/type
+                                          amperity.ent.node/metadata] :as m}]
+                      [(fn-change-type (:amperity.ent.diff/type m))
+                       type
+                       label
+                       path
+                       metadata])
+        rows (mapv fn-map->row report)] 
+    (with-open [w (clojure.java.io/writer file-name)]
+      (clojure.data.csv/write-csv w  (cons header rows)))
+    (prn :download-url (amperity.repl.tools.util/download-url file-name)))

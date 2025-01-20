@@ -1,0 +1,59 @@
+10 REM **Frogger Game**
+20 REM **Initialize Variables**
+30 LET frogX = 10  ' Starting position of the frog (horizontal)
+40 LET frogY = 20  ' Starting position of the frog (vertical)
+50 LET gameOver = 0 ' Flag for game over state
+60 LET score = 0  ' Player's score
+
+70 REM **Draw the Game Area**
+80 CLS  ' Clear the screen
+90 PRINT "Frogger Game"
+100 PRINT "Use W/A/S/D to move. Avoid cars!"
+110 PRINT "Score: "; score
+120 FOR y = 1 TO 20
+130   FOR x = 1 TO 20
+140     IF x = frogX AND y = frogY THEN
+150       PRINT "F",;  ' Draw frog at its current position
+160     ELSE
+170       IF (y MOD 5) = 0 AND (x MOD 2) = 0 THEN  ' Cars moving
+180         PRINT "C",;  ' Draw cars
+190       ELSE
+200         PRINT " ",;  ' Empty space
+210       END IF
+220     END IF
+230   NEXT x
+240 NEXT y
+
+250 REM **Check for User Input (Movement)**
+260 PRINT "Move (W:Up, A:Left, S:Down, D:Right)"
+270 INPUT userInput$
+280 IF userInput$ = "W" THEN LET frogY = frogY - 1
+290 IF userInput$ = "S" THEN LET frogY = frogY + 1
+300 IF userInput$ = "A" THEN LET frogX = frogX - 1
+310 IF userInput$ = "D" THEN LET frogX = frogX + 1
+
+320 REM **Boundary Checks**
+330 IF frogX < 1 THEN LET frogX = 1  ' Don't let the frog go off the left
+340 IF frogX > 20 THEN LET frogX = 20 ' Don't let the frog go off the right
+350 IF frogY < 1 THEN LET frogY = 1  ' Don't let the frog go off the top
+360 IF frogY > 20 THEN LET frogY = 20 ' Don't let the frog go off the bottom
+
+370 REM **Collision Check**
+380 IF frogY = 5 AND frogX MOD 2 = 0 THEN LET gameOver = 1  ' Frog hits a car
+390 IF frogY = 10 AND frogX MOD 2 = 0 THEN LET gameOver = 1
+400 IF frogY = 15 AND frogX MOD 2 = 0 THEN LET gameOver = 1
+410 IF frogY = 20 AND frogX MOD 2 = 0 THEN LET gameOver = 1
+
+420 REM **Score and Game Over**
+430 IF frogY = 1 THEN
+440   LET score = score + 1  ' Increase score if the frog reaches the top
+450   PRINT "You reached the top! Score: "; score
+460   LET frogY = 20  ' Reset frog position after reaching the top
+470 END IF
+
+480 IF gameOver = 1 THEN
+490   PRINT "Game Over! Final Score: "; score
+500   END
+
+510 REM **Repeat Game Loop**
+520 GOTO 70

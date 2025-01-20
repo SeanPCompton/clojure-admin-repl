@@ -1,0 +1,101 @@
+Imports System.Math
+
+Module HypervelocityModel
+
+    ' Constants
+    Const g As Double = 9.81 ' Gravitational acceleration (m/s²)
+    Const rho As Double = 1.225 ' Air density at sea level (kg/m³)
+
+    ' Function to calculate drag force
+    Function DragForce(v As Double, Cd As Double, A As Double) As Double
+        Return 0.5 * Cd * A * rho * v ^ 2
+    End Function
+
+    ' Function to calculate trajectory
+    Sub SimulateProjectile(v0 As Double, theta As Double, Cd As Double, A As Double, m As Double, timeStep As Double, maxTime As Double)
+        ' Initial conditions
+        Dim x As Double = 0
+        Dim y As Double = 0
+        Dim vx As Double = v0 * Cos(theta * PI / 180) ' Horizontal velocity (m/s)
+        Dim vy As Double = v0 * Sin(theta * PI / 180) ' Vertical velocity (m/s)
+
+        Dim t As Double = 0 ' Time
+        Dim kineticEnergy As Double
+
+        Console.WriteLine("Time (s) | X (m) | Y (m) | Vx (m/s) | Vy (m/s) | KE (J)")
+
+        ' Simulation loop
+        While y >= 0 And t <= maxTime
+            ' Calculate velocity magnitude
+            Dim v As Double = Sqrt(vx ^ 2 + vy ^ 2)
+
+            ' Calculate drag force
+            Dim Fd As Double = DragForce(v, Cd, A)
+
+            ' Acceleration due to drag
+            Dim ax As Double = -Fd / m * (vx / v)
+            Dim ay As Double = -Fd / m * (vy / v) - g
+
+            ' Update velocities
+            vx += ax * timeStep
+            vy += ay * timeStep
+
+            ' Update positions
+            x += vx * timeStep
+            y += vy * timeStep
+
+            ' Calculate kinetic energy
+            kineticEnergy = 0.5 * m * v ^ 2
+
+            ' Output results
+            If y >= 0 Then
+                Console.WriteLine($"{t:F2} | {x:F2} | {y:F2} | {vx:F2} | {vy:F2} | {kineticEnergy:F2}")
+            End If
+
+            ' Increment time
+            t += timeStep
+        End While
+
+        Console.WriteLine("Simulation Complete.")
+    End Sub
+
+    ' Main procedure
+    Sub Main()
+        ' Input parameters
+        Dim v0 As Double = 3000 ' Initial velocity (m/s)
+        Dim theta As Double = 45 ' Launch angle (degrees)
+        Dim Cd As Double = 0.1 ' Drag coefficient (dimensionless)
+        Dim A As Double = 0.005 ' Cross-sectional area (m²)
+        Dim m As Double = 0.02 ' Mass (kg)
+        Dim timeStep As Double = 0.001 ' Time step for simulation (s)
+        Dim maxTime As Double = 20 ' Maximum simulation time (s)
+
+        ' Display parameters
+        Console.WriteLine("=== Hypervelocity Projectile Simulation ===")
+        Console.WriteLine($"Initial Velocity: {v0} m/s")
+        Console.WriteLine($"Launch Angle: {theta} degrees")
+        Console.WriteLine($"Drag Coefficient: {Cd}")
+        Console.WriteLine($"Cross-sectional Area: {A} m²")
+        Console.WriteLine($"Mass: {m} kg")
+        Console.WriteLine($"Time Step: {timeStep} s")
+        Console.WriteLine($"Maximum Time: {maxTime} s")
+        Console.WriteLine("===========================================")
+
+        ' Run simulation
+        SimulateProjectile(v0, theta, Cd, A, m, timeStep, maxTime)
+    End Sub
+
+End Module
+
+
+Objective: Model the motion of a hypervelocity projectile (e.g., railgun or gas gun projectile).
+Key Parameters:
+Initial velocity (v0) in m/s.
+Angle of launch (theta) in degrees.
+Drag coefficient (Cd).
+Cross-sectional area (A) of the projectile in m².
+Mass of the projectile (m) in kg.
+Air density (rho) in kg/m³.
+Outputs:
+Trajectory (x, y positions over time).
+Velocity, acceleration, and energy at key points.

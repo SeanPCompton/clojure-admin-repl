@@ -1,0 +1,129 @@
+TO METALLICA
+    CLEARSCREEN
+    PENUP
+    BACK 200
+    PENDOWN
+    DRAW-M
+    PENUP
+    FORWARD 50
+    PENDOWN
+    DRAW-E
+    PENUP
+    FORWARD 50
+    PENDOWN
+    DRAW-T
+    PENUP
+    FORWARD 50
+    PENDOWN
+    DRAW-A
+    PENUP
+    FORWARD 50
+    PENDOWN
+    DRAW-L
+    PENUP
+    FORWARD 50
+    PENDOWN
+    DRAW-L
+    PENUP
+    FORWARD 50
+    PENDOWN
+    DRAW-I
+    PENUP
+    FORWARD 30
+    PENDOWN
+    DRAW-C
+    PENUP
+    FORWARD 50
+    PENDOWN
+    DRAW-A
+END
+
+TO DRAW-M
+    ; Draw the "M" with sharp angular extensions
+    SETPENSIZE [3 3]
+    LEFT 90
+    FORWARD 50
+    RIGHT 135
+    FORWARD 50
+    LEFT 90
+    FORWARD 50
+    RIGHT 135
+    FORWARD 50
+    BACK 50
+    RIGHT 90
+    FORWARD 15
+END
+
+TO DRAW-E
+    ; Draw the "E"
+    SETPENSIZE [3 3]
+    FORWARD 50
+    BACK 50
+    RIGHT 90
+    FORWARD 30
+    LEFT 90
+    FORWARD 25
+    BACK 25
+    RIGHT 90
+    FORWARD 20
+    LEFT 90
+    FORWARD 25
+END
+
+TO DRAW-T
+    ; Draw the "T" with a top bar
+    SETPENSIZE [3 3]
+    FORWARD 50
+    BACK 25
+    RIGHT 90
+    FORWARD 30
+    BACK 30
+    LEFT 90
+    FORWARD 25
+    BACK 50
+END
+
+TO DRAW-A
+    ; Draw the "A" with sharp points
+    SETPENSIZE [3 3]
+    FORWARD 50
+    RIGHT 135
+    FORWARD 50
+    BACK 25
+    RIGHT 90
+    FORWARD 25
+    BACK 50
+END
+
+TO DRAW-L
+    ; Draw the "L"
+    SETPENSIZE [3 3]
+    FORWARD 50
+    BACK 50
+    RIGHT 90
+    FORWARD 30
+END
+
+TO DRAW-I
+    ; Draw the "I"
+    SETPENSIZE [3 3]
+    FORWARD 50
+    BACK 25
+    RIGHT 90
+    FORWARD 10
+    BACK 20
+    FORWARD 10
+    LEFT 90
+    BACK 25
+END
+
+TO DRAW-C
+    ; Draw the "C"
+    SETPENSIZE [3 3]
+    RIGHT 90
+    FORWARD 50
+    LEFT 90
+    FORWARD 30
+    LEFT 90
+    FORWARD 50
+END

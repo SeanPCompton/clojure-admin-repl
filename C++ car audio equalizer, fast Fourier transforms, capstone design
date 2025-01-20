@@ -1,0 +1,86 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <fftw3.h>
+
+// Constants
+const int SAMPLE_RATE = 44100; // Sampling rate (Hz)
+const int BUFFER_SIZE = 1024;  // Number of samples for FFT
+const int FREQUENCY_BANDS = 10; // Number of equalizer frequency bands
+
+// Function to generate mock ambient noise data (simulating microphone input)
+void generateAmbientNoise(std::vector<double>& buffer) {
+    for (int i = 0; i < buffer.size(); ++i) {
+        buffer[i] = 0.5 * sin(2 * M_PI * 200 * i / SAMPLE_RATE) // 200 Hz (wind noise)
+                    + 0.3 * sin(2 * M_PI * 1000 * i / SAMPLE_RATE); // 1000 Hz (road noise)
+    }
+}
+
+// Function to perform FFT and calculate power spectrum
+void analyzeFrequencies(const std::vector<double>& input, std::vector<double>& powerSpectrum) {
+    // Allocate FFT input and output arrays
+    fftw_complex* out = fftw_alloc_complex(BUFFER_SIZE / 2 + 1);
+    double* in = fftw_alloc_real(BUFFER_SIZE);
+
+    // Copy input data to FFTW input array
+    for (int i = 0; i < BUFFER_SIZE; ++i) {
+        in[i] = (i < input.size()) ? input[i] : 0.0; // Zero-padding if needed
+    }
+
+    // Create FFT plan
+    fftw_plan plan = fftw_plan_dft_r2c_1d(BUFFER_SIZE, in, out, FFTW_ESTIMATE);
+
+    // Execute FFT
+    fftw_execute(plan);
+
+    // Calculate power spectrum
+    for (int i = 0; i < BUFFER_SIZE / 2 + 1; ++i) {
+        powerSpectrum[i] = sqrt(out[i][0] * out[i][0] + out[i][1] * out[i][1]); // Magnitude
+    }
+
+    // Clean up
+    fftw_destroy_plan(plan);
+    fftw_free(in);
+    fftw_free(out);
+}
+
+// Function to adjust equalizer based on frequency analysis
+void adjustEqualizer(const std::vector<double>& powerSpectrum, std::vector<double>& equalizerSettings) {
+    // Frequency bands (in Hz) for a 10-band equalizer
+    const int bands[FREQUENCY_BANDS] = {31, 62, 125, 250, 500, 1000, 2000, 4000, 8000, 16000};
+
+    // Map power spectrum to equalizer bands
+    for (int i = 0; i < FREQUENCY_BANDS; ++i) {
+        double bandPower = 0.0;
+        int startFreq = (i == 0) ? 0 : bands[i - 1];
+        int endFreq = bands[i];
+        for (int j = startFreq; j < endFreq && j < powerSpectrum.size(); ++j) {
+            bandPower += powerSpectrum[j];
+        }
+
+        // Adjust equalizer to reduce noise in the band
+        equalizerSettings[i] = std::max(0.0, 1.0 - bandPower / 1000.0); // Normalize adjustments
+    }
+}
+
+int main() {
+    // Step 1: Generate ambient noise data (mock data)
+    std::vector<double> ambientNoise(BUFFER_SIZE);
+    generateAmbientNoise(ambientNoise);
+
+    // Step 2: Analyze frequencies using FFT
+    std::vector<double> powerSpectrum(BUFFER_SIZE / 2 + 1);
+    analyzeFrequencies(ambientNoise, powerSpectrum);
+
+    // Step 3: Adjust equalizer settings based on frequency analysis
+    std::vector<double> equalizerSettings(FREQUENCY_BANDS, 1.0); // Default flat equalizer
+    adjustEqualizer(powerSpectrum, equalizerSettings);
+
+    // Step 4: Output results
+    std::cout << "Equalizer Settings (by frequency band):\n";
+    for (int i = 0; i < FREQUENCY_BANDS; ++i) {
+        std::cout << "Band " << i + 1 << ": " << equalizerSettings[i] << "\n";
+    }
+
+    return 0;
+}
